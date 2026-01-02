@@ -10,7 +10,7 @@ export function AdminPayments() {
       const raw = localStorage.getItem('volubiks_payments_config');
       if (raw) setCfg(JSON.parse(raw));
     } catch {}
-  }, []);q
+  }, []);
 
   const save = () => {
     try {
