@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import AdminPayments from './components/AdminPayments';
+import { AdminPayments } from './components/AdminPayments';
 
 function loadCart() {
   try {

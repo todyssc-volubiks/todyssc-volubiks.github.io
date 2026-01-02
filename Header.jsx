@@ -54,6 +54,10 @@ export default function Header() {
             }}
           />
         </div>
+        <div>
+          <div className="brand-title">Royal Volubiks</div>
+          <div className="brand-sub">Jewelries</div>
+        </div>
       </div>
 
       <form className="search-form" onSubmit={onSearch}>

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import * as XLSX from 'xlsx';
 import { Helmet } from 'react-helmet-async';
 
 function loadCart() {
@@ -16,53 +15,21 @@ export default function Checkout() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    // Fetch latest products from Excel
+    // Fetch latest products from JSON
     const fetchProducts = async () => {
       try {
-        const response = await fetch('/data/products.xlsx?t=' + Date.now());
-        const arrayBuffer = await response.arrayBuffer();
-        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const rawData = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+        const response = await fetch('/data/products.json?t=' + Date.now());
+        const data = await response.json();
         
-        const normalized = rawData.map((r, i) => {
-          const id = String(r.id || (i + 1));
-          const product = {
-            id: id,
-            name: (r.name || '').trim(),
-            slug: (r.slug || '').trim() || (r.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-            price: Number(r.price || 0),
-            currency: (r.currency || 'NGN').toUpperCase(),
-            image: '', // primary image
-            images: [], // ordered list of images
-            description: (r.description || '').trim(),
-            category: (r.category || '').trim(),
-            featured: String(r.featured || '').toLowerCase() === 'true',
-            inventory: Number(r.inventory || 0),
-            tags: (typeof r.tags === 'string' && r.tags.length) ? r.tags.split(/[,;]+/).map(s => s.trim()) : []
-          };
-
-          // Set images based on available images
-          let baseImages = [];
-          if (id === '1') {
-            baseImages = ['/images/4.jpg', '/images/4-1.jpg', '/images/4-2.jpg', '/images/4-3.jpg'];
-          } else if (id === '2') {
-            baseImages = ['/images/IMG-1.jpg', '/images/IMG-2.jpg', '/images/IMG-3.jpg'];
-          } else if (id === '3') {
-            baseImages = ['/images/golden_green_chain_1.jpg', '/images/golden_green_chain_2.jpg', '/images/golden_green_chain_3.jpg', '/images/golden_green_chain_4.jpg'];
-          } else if (id === '4') {
-            baseImages = ['/images/Screenshot_20251225-175416.jpg'];
-          }
-          product.images = baseImages;
-          product.image = product.images[0] || (r.image || '').trim();
-
-          return product;
-        });
+        const normalized = data.map(product => ({
+          ...product,
+          images: product.images || [],
+          image: product.image || ''
+        }));
         
         setProducts(normalized);
       } catch (error) {
-        console.error('Failed to fetch products from Excel:', error);
+        console.error('Failed to fetch products from JSON:', error);
       }
     };
     fetchProducts();
